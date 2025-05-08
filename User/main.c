@@ -14,9 +14,9 @@
 
 /*变量声明区*/
 float kp=0.3,ki=0.2,kd=0;
-float Target_A,Actual_A,Out_A;  //负数前进
+float Target_A=-20,Actual_A,Out_A;  //负数前进
 float error0_A,error1_A,errorint_A;
-float Target_B,Actual_B,Out_B;
+float Target_B=20,Actual_B,Out_B;
 float error0_B,error1_B,errorint_B;
 
 void PID_SetSpeed(void);
@@ -33,14 +33,16 @@ int main(void)
 	Key_Init();
 	
 	OLED_ShowString(1, 1, "Yaw:");
-	OLED_ShowString(2, 1, "flag:");
+	OLED_ShowString(2, 1, "OUTA:");
+	OLED_ShowString(3, 1, "OUTB:");
 	while (1)
 	{  
 		 IMU_0();
 		 float Yaw=((float)(Serial_RxPacket[13]| (Serial_RxPacket[14]<<8))) *  0.0054931640625f;
      OLED_ShowNum(1,5,Yaw,3);
 		 bt_Getdata();
-		 OLED_ShowNum(2,6,bt_rxflag,1);
+		 OLED_ShowNum(2,6,Out_A,3);
+		 OLED_ShowNum(3,6,Out_B,3);
 	}
 }
 
@@ -57,13 +59,7 @@ void TIM4_IRQHandler (void){
 		   if(count>=40)  //计数分频
 			 {
 			    count = 0;
-				 	bt_Getdata();
-		      if(bt_rxflag==1){MotorA_SetPWM(10);MotorB_SetPWM(10);/*PID_SetSpeed()*/;}
-		      if(bt_rxflag==2){MotorA_SetPWM(0);MotorB_SetPWM(0);}
-		      if(bt_rxflag==3){MotorA_SetPWM(-10);MotorB_SetPWM(-10);}
-		      if(bt_rxflag==4){MotorA_SetPWM(10);MotorB_SetPWM(-10);}
-		      if(bt_rxflag==5){MotorA_SetPWM(-10);MotorB_SetPWM(10);}
-//          PID_SetSpeed();
+            PID_SetSpeed();
 //				  SpeedA= EncoderA_Get();
 //				  SpeedB= EncoderB_Get();
 //				  Yaw0 = Yaw1;
