@@ -4,11 +4,9 @@
 #include "math.h"
 #include "Serial.h"
 #include "delay.h"
+#include "encoder.h"
 
-#define TURN_SPEED        50    // 转弯速度
-#define TURN_GAIN         5.0f   // 转向比例系数
-#define YAW_TOLERANCE     2.0f   // 角度容差
-#define TARGET_ANGLE      90.0f  // 目标角度
+float kp=0.3,ki=0.2,kd=0;
 
 void MotorA_Init(void)
 {
@@ -71,10 +69,42 @@ void MotorB_SetPWM(int8_t PWM)
 	}
 }
 
-
-void Turn90Degrees(int direction) {
-    
-        MotorA_SetPWM(15);
-			  MotorB_SetPWM(-15);
-
+float PID_A(float targetA){
+	  float error0=0,error1=0,errorint=0;
+	  float Target,Actual,Out;
+	  Target=-targetA;
+    Actual = EncoderA_Get();  //获取实际速度 
+    error1=error0;  //获取本次误差和上次误差
+		error0=Target-Actual;
+		errorint+=error0; //误差积分
+		Out = kp*error0 + ki*errorint + kd*(error0-error1);  //计算pid
+		if(Out>100){Out=100;}  //输出限幅
+		if(Out<-100){Out=-100;} 
+		return -Out;
 }
+
+float PID_B(float targetB){
+	  float error0=0,error1=0,errorint=0;
+	  float Target,Actual,Out;
+	  Target=targetB;
+    Actual = EncoderB_Get();  //获取实际速度 
+    error1=error0;  //获取本次误差和上次误差
+		error0=Target-Actual;
+		errorint+=error0; //误差积分
+		Out = kp*error0 + ki*errorint + kd*(error0-error1);  //计算pid
+		if(Out>100){Out=100;}  //输出限幅
+		if(Out<-100){Out=-100;} 
+		return Out;
+}
+
+int angle(float Angle,float Gyroy,float Mechanical_Angle)
+{
+	float Kp = 5; //       
+  float Kd = 0;//      
+	float Bias; //角度误差值
+	int balance_up; //直立环控制PWM
+	if(Angle>180){Angle=-(360-Angle);}
+	Bias=Angle-Mechanical_Angle; //角度误差值==测量的俯仰角-理想角度（机械平衡角度）
+	balance_up= Kp*Bias+ Kd*Gyroy; //计算平衡控制的电机PWM  PD控制   Up_balance_KP是P系数,Up_balance_KD是D系数
+	return balance_up;
+} 

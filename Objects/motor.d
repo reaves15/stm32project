@@ -32,3 +32,4 @@
 .\objects\motor.o: .\System\delay.h
 .\objects\motor.o: D:\keil5\Keil5 MDK\ARM\ARMCC\Bin\..\include\math.h
 .\objects\motor.o: Hardware\Serial.h
+.\objects\motor.o: Hardware\encoder.h

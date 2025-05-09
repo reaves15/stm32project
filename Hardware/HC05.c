@@ -15,7 +15,7 @@ void bt_Getdata(void){
 			if(bt_rxdata == 'b'){bt_rxflag=3;}
 			if(bt_rxdata == 'l'){bt_rxflag=4;}
 			if(bt_rxdata == 'r'){bt_rxflag=5;}
-			if(bt_rxdata == 'a'){bt_rxflag=6;}
+			if(bt_rxdata == 'a'){bt_rxflag=6;} //  30速直线行驶
 	  }
 }
 
